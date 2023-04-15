@@ -1,0 +1,45 @@
+fra:
+  actions:
+    backend/rides:
+      index: "Trajets géolocalisés"
+      show: "Section du trajet géolocalisé : %{number}"
+    backend/ride_sets:
+      index: "Trajets géolocalisés"
+      show: "Trajet géolocalisé : %{number}"
+  labels:
+    create_from_planned_intervention: "Rapprocher avec une intervention planifiée"
+    samsys_incoming_data_exchange: "Machines, capteurs et trajets géolocalisés"
+    samsys_outgoing_data_exchange: "Zones cultivables"
+    area_without_overlap: "Surface sans recouvrement"
+    area_with_overlap: "Surface avec recouvrement"
+    converted: "Déjà converti"
+    ride_set_message: "Pour synchroniser vos trajets géolocalisés avec vos capteurs connectés, veuillez configurer votre compte dans Outils > Connexions partenaires"
+    samsys_short_description: Géolocalisation des équipements
+    samsys_long_description:  Samsys fournit des capteurs de géolocalisation pour le matériel agricole
+    samsys_url: https://samsys.fr/
+    hard_start: "Début"
+    hard_stop: "Fin"
+    partially_converted: "Partiellement converti"
+    pause: "Pause"
+    point: "Point"
+    resume: "CV"
+    ride: "Trajet"
+    road: "Distance totale en km"
+    samsys_synchronisation: Synchronisation Samsys
+    scan: "Balayage"
+    sleep_duration: "Temps de pause"
+    start: "Démarrer"
+    started_at: "Début du trajet"
+    stop: "Arrêtez"
+    started_at: "Début du trajet"
+    startend: "Début / fin"
+    ride_geo: "Trajet géolocalisé"
+    ride_number: "Numéro"
+    ride_paused_at: "Pause à"
+    ride_duration: "Durée"
+    ride_set_to_ride_information:  "Cliquez sur un trajet géolocalisé pour le visualiser sur une carte, puis sélectionnez ses différentes sections pour le convertir en nouvelle intervention ou le rapprocher d'une intervention déjà planifiée"
+    road: "Distance totale en km"
+    to_convert: "À convertir"
+    correct_samsys_fetch_params: "La synchronisation Samsys est terminée, les %{count} nouveaux trajets sont disponibles dans Ekylibre"
+    failed_samsys_fetch_params: "Une erreur s'est produite lors de la synchronisation Samsys\_: %{message}"
+    success_destroying_equipment: "L'équipement a été supprimé chez Samsys"
