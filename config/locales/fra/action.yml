@@ -1,12 +1,10 @@
 fra:
-  actions:
-    backend/rides:
-      index: "Trajets géolocalisés"
-      show: "Section du trajet géolocalisé : %{number}"
-    backend/ride_sets:
-      index: "Trajets géolocalisés"
-      show: "Trajet géolocalisé : %{number}"
   labels:
+    traccar_short_description: Solution de suivi GPS temps réel
+    traccar_long_description: Connectez-vous à Traccar pour récupérer automatiquement les trajets de vos equipements et personnes.
+    traccar_url: https://www.traccar.org/
+    traccar_incoming_data_exchange: "Données géolocalisées des personnes et equipements"
+    traccar_outgoing_data_exchange: "Parcelles à surveiller"
     create_from_planned_intervention: "Rapprocher avec une intervention planifiée"
     samsys_incoming_data_exchange: "Machines, capteurs et trajets géolocalisés"
     samsys_outgoing_data_exchange: "Zones cultivables"
