@@ -1,0 +1,8 @@
+- integration = Integration.find_by(nature: 'traccar')
+- if integration.present?
+  - job_running = Preference.get(:traccar_fetch_job_running, false, :boolean)&.value
+  - main_toolbar do |t|
+    = link_to :traccar_interface.tl, integration.parameters["web_url"], class: "btn btn-primary", target: '_blank'
+    = tool_to(:traccar_synchronisation.tl, sync_traccar_traccar_synchronization_path(user_id: current_user.id), class: 'btn btn-default icn btn-load update-job', disabled: job_running)
+    - if job_running
+      = content_tag(:i, nil, class: 'bqspinner')
