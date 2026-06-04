@@ -5,29 +5,37 @@ class TraccarFetchUpdateCreateJob < ActiveJob::Base
   def perform(user_id: nil)
     Preference.set!(:traccar_fetch_job_running, true, :boolean)
     user = User.find(user_id) if user_id
-    begin
-      # create user link for connecting directly to Traccar
-      Traccar::ManageToken.new.create_user_link
-      # find and create or update equipments in Traccar from tractor in Ekylibre
-      Traccar::ManageEquipment.new.update_devices
-      # find and create or update geofences in Traccar from cultivable zones in Ekylibre
-      Traccar::ManageGeofence.new.update_geofences
-      # get positions in Traccar and store in crumbs in Ekylibre
-      @count = Traccar::GrabPosition.new.get_positions
-      # get trips in Traccar and store in ride_sets in Ekylibre
-      user.notifications.create!(success_traccar_fetch_params) if user.present?
-      Preference.set!(:traccar_fetch_job_running, false, :boolean)
-    rescue StandardError => error
-      Preference.set!(:traccar_fetch_job_running, false, :boolean)
-      Rails.logger.error $ERROR_INFO
-      Rails.logger.error $ERROR_INFO.backtrace.join("\n")
-      ExceptionNotifier.notify_exception($ERROR_INFO, data: { message: error })
-      @error = error.message
-      user.notifications.create!(errors_traccar_fetch_params) if user.present?
+    @errors = []
+    @count = 0
+
+    run_step('manage_token')     { Traccar::ManageToken.new.create_user_link }
+    run_step('manage_equipment') { Traccar::ManageEquipment.new.update_devices }
+    run_step('manage_geofence')  { Traccar::ManageGeofence.new.update_geofences }
+    @count = run_step('grab_position') { Traccar::GrabPosition.new.get_positions } || 0
+
+    if user.present?
+      if @errors.any?
+        @error = @errors.join('; ')
+        user.notifications.create!(errors_traccar_fetch_params)
+      else
+        user.notifications.create!(success_traccar_fetch_params)
+      end
     end
+  ensure
+    Preference.set!(:traccar_fetch_job_running, false, :boolean)
   end
 
   private
+
+    def run_step(name)
+      yield
+    rescue StandardError => error
+      Rails.logger.error "[Traccar] step #{name} failed: #{error.class}: #{error.message}"
+      Rails.logger.error error.backtrace.join("\n")
+      ExceptionNotifier.notify_exception(error, data: { traccar_step: name })
+      @errors << "#{name}: #{error.message}"
+      nil
+    end
 
     def errors_traccar_fetch_params
       {

@@ -40,11 +40,15 @@ module Traccar
     private
 
         def fetch_devices
-          ::Traccar::TraccarIntegration.fetch_devices.execute do |c|
+          result = ::Traccar::TraccarIntegration.fetch_devices.execute do |c|
             c.success do |devices|
               devices
             end
           end
+          result.is_a?(Array) ? result : []
+        rescue StandardError => e
+          Rails.logger.error "[Traccar] fetch_devices failed: #{e.class}: #{e.message}"
+          []
         end
 
         def create_device(equipment)

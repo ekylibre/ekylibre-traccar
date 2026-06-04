@@ -48,19 +48,27 @@ module Traccar
     private
 
         def fetch_positions(device_id, from, to)
-          ::Traccar::TraccarIntegration.fetch_positions(device_id, from, to).execute do |c|
+          result = ::Traccar::TraccarIntegration.fetch_positions(device_id, from, to).execute do |c|
             c.success do |positions|
               positions
             end
           end
+          result.is_a?(Array) ? result : []
+        rescue StandardError => e
+          Rails.logger.error "[Traccar] fetch_positions(device=#{device_id}, from=#{from}, to=#{to}) failed: #{e.class}: #{e.message}"
+          []
         end
 
         def fetch_trips(device_id, from, to)
-          ::Traccar::TraccarIntegration.fetch_trips(device_id, from, to).execute do |c|
+          result = ::Traccar::TraccarIntegration.fetch_trips(device_id, from, to).execute do |c|
             c.success do |trips|
               trips
             end
           end
+          result.is_a?(Array) ? result : []
+        rescue StandardError => e
+          Rails.logger.error "[Traccar] fetch_trips(device=#{device_id}, from=#{from}, to=#{to}) failed: #{e.class}: #{e.message}"
+          []
         end
 
         def find_last_crumb(device_id)

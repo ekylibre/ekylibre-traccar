@@ -31,11 +31,15 @@ module Traccar
     private
 
         def fetch_geofences
-          ::Traccar::TraccarIntegration.fetch_geofences.execute do |c|
+          result = ::Traccar::TraccarIntegration.fetch_geofences.execute do |c|
             c.success do |geofences|
               geofences
             end
           end
+          result.is_a?(Array) ? result : []
+        rescue StandardError => e
+          Rails.logger.error "[Traccar] fetch_geofences failed: #{e.class}: #{e.message}"
+          []
         end
 
         def create_geofence(cz)
