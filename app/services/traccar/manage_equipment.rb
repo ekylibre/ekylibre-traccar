@@ -17,7 +17,7 @@ module Traccar
         if traccar_device.present?
           # check if id is already set in Ekylibre or not because server can change
           if equipment.provider_data[:id].to_s != traccar_device[:id].to_s
-            equipment.update(provider: { vendor: @vendor, name: 'device', data: { id: traccar_device[:id].to_s, updated_at: Time.now } })
+            sync_provider(equipment, traccar_device[:id])
             puts "Device #{equipment.name} already exists in Traccar and Ekylibre but server has change."
           else
             puts "Device #{equipment.name} already exists in Traccar and Ekylibre."
@@ -25,12 +25,12 @@ module Traccar
         elsif traccar_not_sync_device.present?
           # Update device in Traccar with uuid
           traccar_call = update_device(traccar_not_sync_device[:id], equipment)
-          equipment.update(provider: { vendor: @vendor, name: 'device', data: { id: traccar_call[:id].to_s, updated_at: Time.now } })
+          sync_provider(equipment, traccar_call[:id])
           puts "Device #{equipment.name} already exists in Traccar and Ekylibre but not sync with Ekylibre."
         else
           # Create a new device in Traccar
           traccar_call = create_device(equipment)
-          equipment.update(provider: { vendor: @vendor, name: 'device', data: { id: traccar_call[:id].to_s, updated_at: Time.now } })
+          sync_provider(equipment, traccar_call[:id])
           puts "Device #{equipment.name} created in Traccar."
         end
       end
@@ -65,6 +65,18 @@ module Traccar
               device
             end
           end
+        end
+
+        # Writes the Traccar provider metadata directly to the row, bypassing
+        # optimistic locking and Product's after_save cascade (set_initial_values,
+        # build_new_phase, movements.build). The provider jsonb is metadata only —
+        # no callback observes it, so skipping them is safe and avoids the
+        # StaleObjectError race between Equipment.tractors snapshot and update.
+        def sync_provider(equipment, traccar_id)
+          equipment.update_columns(
+            provider: { vendor: @vendor, name: 'device', data: { id: traccar_id.to_s, updated_at: Time.now } },
+            updated_at: Time.current
+          )
         end
   end
 end
